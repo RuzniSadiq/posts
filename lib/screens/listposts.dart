@@ -1,7 +1,12 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:post/screens/post.dart';
+import 'package:http/http.dart' as http;
+
+import '../models/posts.dart';
 
 class ListPosts extends StatefulWidget {
   const ListPosts({Key? key}) : super(key: key);
@@ -14,7 +19,9 @@ class _ListPostsState extends State<ListPosts> {
   // Initial Selected Value
   String dropdownvalue = 'All';
 
-  Stream? stream;
+  Stream stream = FirebaseFirestore.instance.collection('post').snapshots();
+  String name = "";
+
 
   // List of items in our dropdown menu
   var items = [
@@ -66,60 +73,79 @@ class _ListPostsState extends State<ListPosts> {
   }
 
   @override
-  void initState() {
-    changestream();
-
-    // TODO: implement initState
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        backgroundColor: Colors.black,
+        title: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Card(
+            child: TextField(
+              onChanged: (val){
+                setState(() {
+                  name = val;
+                });
+              },
+
+            ),
+          ),
+        ),
+      ),
       body: SafeArea(
           child: Container(
         child: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: MaterialButton(
-                  child: Text(
-                    "Add Post",
-                    style: TextStyle(color: Colors.white),
-                  ),
-                  color: Colors.black,
-                  onPressed: () {
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) =>
-                            // TaskCardWidget(id: user.id, name: user.ingredients,)
-                            Post()));
-                  }),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: MaterialButton(
+                      child: Text(
+                        "Add Post",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      color: Colors.black,
+                      onPressed: () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) =>
+                                // TaskCardWidget(id: user.id, name: user.ingredients,)
+                                Post()));
+                      }),
+                ),
+                DropdownButton(
+                  // Initial Value
+                  value: dropdownvalue,
+
+                  // Down Arrow Icon
+                  icon: const Icon(Icons.keyboard_arrow_down),
+
+                  // Array list of items
+                  items: items.map((String items) {
+                    return DropdownMenuItem(
+                      value: items,
+                      child: Text(items),
+                    );
+                  }).toList(),
+
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      dropdownvalue = newValue!;
+                      changestream();
+                    });
+                  },
+                ),
+              ],
             ),
-            DropdownButton(
-              // Initial Value
-              value: dropdownvalue,
 
-              // Down Arrow Icon
-              icon: const Icon(Icons.keyboard_arrow_down),
-
-              // Array list of items
-              items: items.map((String items) {
-                return DropdownMenuItem(
-                  value: items,
-                  child: Text(items),
-                );
-              }).toList(),
-
-              onChanged: (String? newValue) {
-                setState(() {
-                  dropdownvalue = newValue!;
-                  changestream();
-                });
-              },
-            ),
             Expanded(
               child: StreamBuilder(
-                stream: stream,
+                stream:
+                (name != "" && name != null)
+                ? FirebaseFirestore.instance.collection('post').where("searchkeyword", arrayContains: name).snapshots()
+                    :
+                stream,
                 builder:
                     (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
                   if (!snapshot.hasData) {

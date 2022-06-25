@@ -12,6 +12,7 @@ class Post extends StatelessWidget {
   final controllerType = TextEditingController();
   final controllerColor = TextEditingController();
   final controllerCategory = TextEditingController();
+  List<String> searchKeywords = [];
 
   @override
   Widget build(BuildContext context) {
@@ -104,6 +105,12 @@ class Post extends StatelessWidget {
                 shape: const RoundedRectangleBorder(
                     borderRadius: BorderRadius.all(Radius.circular(10.0))),
                 onPressed: () async {
+                  String temp = "";
+                  for (var i = 0; i < controllerName.text.length; i++) {
+
+                      temp = temp + controllerName.text[i];
+                      searchKeywords.add(temp);
+                  }
                   ScaffoldMessenger.of(context).showSnackBar((controllerName
                                   .text !=
                               "" &&
@@ -144,6 +151,7 @@ class Post extends StatelessWidget {
                       type: controllerType.text,
                       color: controllerColor.text,
                       category: controllerCategory.text,
+                      searchkeywords: searchKeywords,
                     );
                     final json = posts.toJson();
                     final docPosts =

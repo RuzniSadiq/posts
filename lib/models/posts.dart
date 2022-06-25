@@ -3,13 +3,15 @@ class Posts {
   String? type;
   String? color;
   String? category;
+  List? searchkeywords;
 
 
   Posts({
     this.name,
     this.type,
     this.color,
-    this.category
+    this.category,
+    this.searchkeywords
   });
 
   //convert object to json
@@ -19,15 +21,17 @@ class Posts {
         'type': type,
         'color': color,
         'category': category,
+        'searchkeyword': searchkeywords
       };
 
   //returns user object
-  static Posts fromJson(Map<String, dynamic> json) =>
+  static Posts fromJson(Map<dynamic, dynamic> json) =>
       Posts(
           name: json['name'],
           type: json['type'],
           color: json['color'],
-          category: json['category']
+          category: json['category'],
+          searchkeywords: json['searchkeywords']
       );
 
 }
