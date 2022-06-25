@@ -15,7 +15,7 @@ class _ListPostsState extends State<ListPosts> {
   String dropdownvalue = 'All';
 
   Stream stream = FirebaseFirestore.instance.collection('post').snapshots();
-  String name = "";
+  String searchKeyword = "";
 
 
   // List of items in our dropdown menu
@@ -78,11 +78,11 @@ class _ListPostsState extends State<ListPosts> {
           child: Card(
             child: TextField(
               decoration: const InputDecoration(
-                  hintText: 'Search post by name...'
+                  hintText: 'Search post...'
               ),
               onChanged: (val){
                 setState(() {
-                  name = val;
+                  searchKeyword = val;
                 });
               },
 
@@ -92,99 +92,99 @@ class _ListPostsState extends State<ListPosts> {
       ),
       body: SafeArea(
           child: Container(
-        child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            child: Column(
               children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: MaterialButton(
-                      child: Text(
-                        "Add Post",
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      color: Colors.black,
-                      onPressed: () {
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) =>
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: MaterialButton(
+                          child: Text(
+                            "Add Post",
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          color: Colors.black,
+                          onPressed: () {
+                            Navigator.of(context).push(MaterialPageRoute(
+                                builder: (context) =>
                                 // TaskCardWidget(id: user.id, name: user.ingredients,)
                                 Post()));
-                      }),
+                          }),
+                    ),
+                    DropdownButton(
+                      // Initial Value
+                      value: dropdownvalue,
+
+                      // Down Arrow Icon
+                      icon: const Icon(Icons.keyboard_arrow_down),
+
+                      // Array list of items
+                      items: items.map((String items) {
+                        return DropdownMenuItem(
+                          value: items,
+                          child: Text(items),
+                        );
+                      }).toList(),
+
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          dropdownvalue = newValue!;
+                          changestream();
+                        });
+                      },
+                    ),
+                  ],
                 ),
-                DropdownButton(
-                  // Initial Value
-                  value: dropdownvalue,
 
-                  // Down Arrow Icon
-                  icon: const Icon(Icons.keyboard_arrow_down),
-
-                  // Array list of items
-                  items: items.map((String items) {
-                    return DropdownMenuItem(
-                      value: items,
-                      child: Text(items),
-                    );
-                  }).toList(),
-
-                  onChanged: (String? newValue) {
-                    setState(() {
-                      dropdownvalue = newValue!;
-                      changestream();
-                    });
-                  },
+                Expanded(
+                  child: StreamBuilder(
+                    stream:
+                    (searchKeyword != "" && searchKeyword != null)
+                        ? FirebaseFirestore.instance.collection('post').where("searchkeyword", arrayContains: searchKeyword).snapshots()
+                        :
+                    stream,
+                    builder:
+                        (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+                      if (!snapshot.hasData) {
+                        return Center(child: CircularProgressIndicator());
+                      }
+                      return ListView.builder(
+                        itemCount: snapshot.data?.docs.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          return Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: ListTile(
+                              title: Text(
+                                "${snapshot.data!.docs[index]['name'].toString()}",
+                                style: TextStyle(
+                                  color: Colors.black,
+                                ),
+                              ),
+                              subtitle: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    "Category - ${snapshot.data!.docs[index]['category'].toString()}",
+                                  ),
+                                  Text(
+                                    "Type - ${snapshot.data!.docs[index]['type'].toString()}",
+                                  ),
+                                  Text(
+                                    "Color - ${snapshot.data!.docs[index]['color'].toString()}",
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  ),
                 ),
               ],
             ),
-
-            Expanded(
-              child: StreamBuilder(
-                stream:
-                (name != "" && name != null)
-                ? FirebaseFirestore.instance.collection('post').where("searchkeyword", arrayContains: name).snapshots()
-                    :
-                stream,
-                builder:
-                    (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-                  if (!snapshot.hasData) {
-                    return Center(child: CircularProgressIndicator());
-                  }
-                  return ListView.builder(
-                    itemCount: snapshot.data?.docs.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      return Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: ListTile(
-                          title: Text(
-                            "${snapshot.data!.docs[index]['name'].toString()}",
-                            style: TextStyle(
-                              color: Colors.black,
-                            ),
-                          ),
-                          subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "Category - ${snapshot.data!.docs[index]['category'].toString()}",
-                              ),
-                              Text(
-                                "Type - ${snapshot.data!.docs[index]['type'].toString()}",
-                              ),
-                              Text(
-                                "Color - ${snapshot.data!.docs[index]['color'].toString()}",
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
-      )),
+          )),
     );
   }
 }

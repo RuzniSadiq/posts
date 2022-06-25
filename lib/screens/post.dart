@@ -106,10 +106,29 @@ class Post extends StatelessWidget {
                     borderRadius: BorderRadius.all(Radius.circular(10.0))),
                 onPressed: () async {
                   String temp = "";
+                  String temp2 = "";
+                  String temp3 = "";
+                  String temp4 = "";
+
                   for (var i = 0; i < controllerName.text.length; i++) {
 
                       temp = temp + controllerName.text[i];
                       searchKeywords.add(temp);
+                  }
+                  for (var i = 0; i < controllerCategory.text.length; i++) {
+
+                    temp2 = temp2 + controllerCategory.text[i];
+                    searchKeywords.add(temp2);
+                  }
+                  for (var i = 0; i < controllerType.text.length; i++) {
+
+                    temp3 = temp3 + controllerType.text[i];
+                    searchKeywords.add(temp3);
+                  }
+                  for (var i = 0; i < controllerColor.text.length; i++) {
+
+                    temp4 = temp4 + controllerColor.text[i];
+                    searchKeywords.add(temp4);
                   }
                   ScaffoldMessenger.of(context).showSnackBar((controllerName
                                   .text !=
