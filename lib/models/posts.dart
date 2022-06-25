@@ -25,7 +25,7 @@ class Posts {
       };
 
   //returns user object
-  static Posts fromJson(Map<dynamic, dynamic> json) =>
+  static Posts fromJson(Map<String, dynamic> json) =>
       Posts(
           name: json['name'],
           type: json['type'],
