@@ -1,12 +1,7 @@
-import 'dart:convert';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:post/screens/post.dart';
-import 'package:http/http.dart' as http;
-
-import '../models/posts.dart';
 
 class ListPosts extends StatefulWidget {
   const ListPosts({Key? key}) : super(key: key);
@@ -82,6 +77,9 @@ class _ListPostsState extends State<ListPosts> {
           padding: const EdgeInsets.all(8.0),
           child: Card(
             child: TextField(
+              decoration: const InputDecoration(
+                  hintText: 'Search post by name...'
+              ),
               onChanged: (val){
                 setState(() {
                   name = val;
