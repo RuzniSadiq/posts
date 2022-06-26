@@ -3,7 +3,7 @@ class Posts {
   String? type;
   String? color;
   String? category;
-  List? searchkeywords;
+  List? searchnamekeywords;
 
 
   Posts({
@@ -11,7 +11,7 @@ class Posts {
     this.type,
     this.color,
     this.category,
-    this.searchkeywords
+    this.searchnamekeywords
   });
 
   //convert object to json
@@ -21,7 +21,7 @@ class Posts {
         'type': type,
         'color': color,
         'category': category,
-        'searchkeyword': searchkeywords
+        'searchnamekeywords': searchnamekeywords
       };
 
   //returns user object
@@ -31,7 +31,7 @@ class Posts {
           type: json['type'],
           color: json['color'],
           category: json['category'],
-          searchkeywords: json['searchkeywords']
+          searchnamekeywords: json['searchnamekeywords']
       );
 
 }

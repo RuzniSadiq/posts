@@ -12,7 +12,8 @@ class Post extends StatelessWidget {
   final controllerType = TextEditingController();
   final controllerColor = TextEditingController();
   final controllerCategory = TextEditingController();
-  List<String> searchKeywords = [];
+  List<String> searchNameKeywords = [];
+  List<String> searchColorKeywords = [];
 
   @override
   Widget build(BuildContext context) {
@@ -113,23 +114,23 @@ class Post extends StatelessWidget {
                   for (var i = 0; i < controllerName.text.length; i++) {
 
                       temp = temp + controllerName.text[i];
-                      searchKeywords.add(temp);
+                      searchNameKeywords.add(temp);
                   }
-                  for (var i = 0; i < controllerCategory.text.length; i++) {
-
-                    temp2 = temp2 + controllerCategory.text[i];
-                    searchKeywords.add(temp2);
-                  }
-                  for (var i = 0; i < controllerType.text.length; i++) {
-
-                    temp3 = temp3 + controllerType.text[i];
-                    searchKeywords.add(temp3);
-                  }
-                  for (var i = 0; i < controllerColor.text.length; i++) {
-
-                    temp4 = temp4 + controllerColor.text[i];
-                    searchKeywords.add(temp4);
-                  }
+                  // for (var i = 0; i < controllerCategory.text.length; i++) {
+                  //
+                  //   temp2 = temp2 + controllerCategory.text[i];
+                  //   searchKeywords.add(temp2);
+                  // }
+                  // for (var i = 0; i < controllerType.text.length; i++) {
+                  //
+                  //   temp3 = temp3 + controllerType.text[i];
+                  //   searchKeywords.add(temp3);
+                  // }
+                  // for (var i = 0; i < controllerColor.text.length; i++) {
+                  //
+                  //   temp4 = temp4 + controllerColor.text[i];
+                  //   searchKeywords.add(temp4);
+                  // }
                   ScaffoldMessenger.of(context).showSnackBar((controllerName
                                   .text !=
                               "" &&
@@ -170,7 +171,7 @@ class Post extends StatelessWidget {
                       type: controllerType.text,
                       color: controllerColor.text,
                       category: controllerCategory.text,
-                      searchkeywords: searchKeywords,
+                      searchnamekeywords: searchNameKeywords
                     );
                     final json = posts.toJson();
                     final docPosts =
