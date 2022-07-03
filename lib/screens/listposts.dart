@@ -1,6 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:post/screens/post.dart';
+import 'package:post/screens/viewposts.dart';
 
 class ListPosts extends StatefulWidget {
   const ListPosts({Key? key}) : super(key: key);
@@ -77,6 +80,73 @@ class _ListPostsState extends State<ListPosts> {
     }
   }
 
+  TextEditingController news = TextEditingController();
+
+  Future<Uri> createDynamicLink(String id) async {
+    final dynamicLinkParams = DynamicLinkParameters(
+      link: Uri.parse(
+          'https://yourappppppppppppppppppppp.page.link/posts?id=$id'),
+      uriPrefix: "https://yourappppppppppppppppppppp.page.link",
+      androidParameters: const AndroidParameters(
+        packageName: "com.example.post",
+        minimumVersion: 0,
+      ),
+      iosParameters: const IOSParameters(
+        bundleId: "com.example.post",
+        appStoreId: "123456789",
+        minimumVersion: "0",
+      ),
+    );
+    final dynamicLink =
+        await FirebaseDynamicLinks.instance.buildShortLink(dynamicLinkParams);
+
+    Clipboard.setData(ClipboardData(text: dynamicLink.shortUrl.toString()))
+        .then((_) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Link copied to clipboard")));
+    });
+    return dynamicLink.shortUrl;
+  }
+
+  initDynamicLinks(BuildContext context) async {
+    await Future.delayed(const Duration(seconds: 2), () async {
+      final PendingDynamicLinkData? initialLink =
+          await FirebaseDynamicLinks.instance.getInitialLink();
+      FirebaseDynamicLinks.instance.onLink.listen((dynamicLinkData) {
+        final Uri deepLink = dynamicLinkData.link;
+        String idd = deepLink.queryParameters['id'].toString();
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => ViewPosts(
+                    id: idd,
+                  )),
+        );
+      }).onError((error) {
+        // Handle errors
+      });
+
+      if (initialLink != null) {
+        final Uri deepLink = initialLink.link;
+        String idx = deepLink.queryParameters['id'].toString();
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => ViewPosts(
+                    id: idx,
+                  )),
+        );
+      }
+    });
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    initDynamicLinks(context);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -94,16 +164,17 @@ class _ListPostsState extends State<ListPosts> {
                   ),
                   color: Colors.black,
                   onPressed: () {
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) =>
-                            // TaskCardWidget(id: user.id, name: user.ingredients,)
-                            Post()));
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => Post()),
+                    );
                   }),
             ),
           ),
           Padding(
             padding: const EdgeInsets.all(6.0),
             child: TextField(
+              controller: news,
               decoration: const InputDecoration(hintText: 'Search Name...'),
               onChanged: (val) {
                 _searchName.value = val;
@@ -153,28 +224,49 @@ class _ListPostsState extends State<ListPosts> {
                                         (BuildContext context, int index) {
                                       return Padding(
                                         padding: const EdgeInsets.all(8.0),
-                                        child: ListTile(
-                                          title: Text(
-                                            snapshot.data!.docs[index]['name']
-                                                .toString(),
-                                            style: const TextStyle(
-                                              color: Colors.black,
+                                        child: InkWell(
+                                          onTap: () {
+                                            Navigator.of(context).push(
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        // TaskCardWidget(id: user.id, name: user.ingredients,)
+                                                        ViewPosts(
+                                                            id: snapshot
+                                                                .data!
+                                                                .docs[index]
+                                                                .id)));
+                                          },
+                                          child: ListTile(
+                                            title: Text(
+                                              snapshot.data!.docs[index]['name']
+                                                  .toString(),
+                                              style: const TextStyle(
+                                                color: Colors.black,
+                                              ),
                                             ),
-                                          ),
-                                          subtitle: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                "Color - ${snapshot.data!.docs[index]['color'].toString()}",
-                                              ),
-                                              Text(
-                                                "Category - ${snapshot.data!.docs[index]['category'].toString()}",
-                                              ),
-                                              Text(
-                                                "Type - ${snapshot.data!.docs[index]['type'].toString()}",
-                                              ),
-                                            ],
+                                            subtitle: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  "Color - ${snapshot.data!.docs[index]['color'].toString()}",
+                                                ),
+                                                Text(
+                                                  "Category - ${snapshot.data!.docs[index]['category'].toString()}",
+                                                ),
+                                                Text(
+                                                  "Type - ${snapshot.data!.docs[index]['type'].toString()}",
+                                                ),
+                                              ],
+                                            ),
+                                            trailing: IconButton(
+                                              onPressed: () {
+                                                createDynamicLink(snapshot
+                                                    .data!.docs[index].id
+                                                    .toString());
+                                              },
+                                              icon: const Icon(Icons.copy),
+                                            ),
                                           ),
                                         ),
                                       );

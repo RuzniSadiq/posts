@@ -112,9 +112,8 @@ class Post extends StatelessWidget {
                   String temp4 = "";
 
                   for (var i = 0; i < controllerName.text.length; i++) {
-
-                      temp = temp + controllerName.text[i];
-                      searchNameKeywords.add(temp);
+                    temp = temp + controllerName.text[i];
+                    searchNameKeywords.add(temp);
                   }
                   // for (var i = 0; i < controllerCategory.text.length; i++) {
                   //
@@ -166,13 +165,12 @@ class Post extends StatelessWidget {
                       controllerType.text != "" &&
                       controllerCategory.text != "") {
                     final posts = Posts(
-                      //assigning the values to the fields
-                      name: controllerName.text,
-                      type: controllerType.text,
-                      color: controllerColor.text,
-                      category: controllerCategory.text,
-                      searchnamekeywords: searchNameKeywords
-                    );
+                        //assigning the values to the fields
+                        name: controllerName.text,
+                        type: controllerType.text,
+                        color: controllerColor.text,
+                        category: controllerCategory.text,
+                        searchnamekeywords: searchNameKeywords);
                     final json = posts.toJson();
                     final docPosts =
                         FirebaseFirestore.instance.collection('post').doc();
